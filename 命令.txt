@@ -1,0 +1,487 @@
+SW3:
+interface GigabitEthernet0/0/1
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+#
+interface GigabitEthernet0/0/2
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+
+interface Ethernet0/0/1
+ port link-type access
+ port default vlan 10
+#
+interface Ethernet0/0/2
+ port link-type trunk
+ port trunk pvid vlan 100
+ port trunk allow-pass vlan 2 to 4094
+
+stp region-configuration
+ region-name JMH
+ revision-level 100
+ instance 1 vlan 10 20 30 40 100 200
+ active region-configuration
+
+---------------------------------
+
+
+SW4:
+interface GigabitEthernet0/0/1
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+#
+interface GigabitEthernet0/0/2
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+
+interface Ethernet0/0/1
+ port link-type access
+ port default vlan 20
+
+stp region-configuration
+ region-name JMH
+ revision-level 100
+ instance 1 vlan 10 20 30 40 100 200
+ active region-configuration
+---------------------------------
+
+SW5:
+
+
+interface GigabitEthernet0/0/1
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+#
+interface GigabitEthernet0/0/2
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+
+interface Ethernet0/0/1
+ port link-type access
+ port default vlan 30
+#
+interface Ethernet0/0/2
+ port link-type trunk
+ port trunk pvid vlan 100
+ port trunk allow-pass vlan 2 to 4094
+
+stp region-configuration
+ region-name JMH
+ revision-level 100
+ instance 1 vlan 10 20 30 40 100 200
+ active region-configuration
+---------------------------------
+
+SW6:
+interface GigabitEthernet0/0/1
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+#
+interface GigabitEthernet0/0/2
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+#
+interface Ethernet0/0/1
+ port link-type access
+ port default vlan 40
+#
+
+stp region-configuration
+ region-name JMH
+ revision-level 100
+ instance 1 vlan 10 20 30 40 100 200
+ active region-configuration
+
+---------------------------------
+
+SW1:
+UNDO  in e
+vlan batch  10 20 30 40 50 53 100 200
+
+int Eth-Trunk 1
+mode lacp-static 
+trunkport g0/0/15
+trunkport g0/0/16
+p l t
+p t a v a
+
+port-group g g0/0/1 to  g0/0/4
+p l t 
+p t a v a
+
+int Eth-Trunk 2
+mode lacp-static 
+trunkport g0/0/7
+trunkport g0/0/8
+p l t
+p t a v a
+
+
+SW2:
+UNDO  in e
+vlan batch  10 20 30 40 51 52 100 200
+
+int Eth-Trunk 1
+mode lacp-static 
+trunkport g0/0/15
+trunkport g0/0/16
+p l t
+p t a v a
+
+port-group g g0/0/1 to  g0/0/4
+p l t 
+p t a v a
+
+---------------------------------
+
+MSTP:
+
+SW1:
+stp region-configuration
+ region-name JMH
+ revision-level 100
+ instance 1 vlan 10 20 30 40 100 200
+ active region-configuration
+
+stp IN 1 root primary 
+
+dhcp enable
+
+ip pool 10
+ gateway-list 192.168.10.254
+ network 192.168.10.0 mask 255.255.255.0
+
+ip pool 20
+ gateway-list 192.268.20.254
+ network 192.168.20.0 mask 255.255.255.0
+
+ip pool 30
+ gateway-list 192.168.30.254
+ network 192.168.30.0 mask 255.255.255.0
+
+ip pool 40
+ gateway-list 192.168.40.254
+ network 192.168.40.0 mask 255.255.255.0
+
+ip pool 200
+ gateway-list 192.268.200.254
+ network 192.168.200.0 mask 255.255.255.0
+
+interface Vlanif10
+ ip address 192.168.10.252 255.255.255.0
+ vrrp vrid 10 virtual-ip 192.168.10.254
+ vrrp vrid 10 priority 150
+ dhcp select global
+
+interface Vlanif20
+ ip address 192.168.20.252 255.255.255.0
+ vrrp vrid 20 virtual-ip 192.168.20.254
+ vrrp vrid 20 priority 150
+ dhcp select global
+
+interface Vlanif30
+ ip address 192.168.30.252 255.255.255.0
+ vrrp vrid 30 virtual-ip 192.168.30.254
+ vrrp vrid 30 priority 150
+ dhcp select global
+
+interface Vlanif40
+ ip address 192.168.40.252 255.255.255.0
+ vrrp vrid 40 virtual-ip 192.168.40.254
+ vrrp vrid 40 priority 150
+ dhcp select global
+
+interface Vlanif200
+ ip address 192.168.200.252 255.255.255.0
+ vrrp vrid 200 virtual-ip 192.168.200.254
+ vrrp vrid 200 priority 150
+ dhcp select global
+
+interface GigabitEthernet0/0/6
+ port link-type access
+ port default vlan 50
+
+int vlan 50
+ip address 192.168.50.1 24
+qui
+
+interface GigabitEthernet0/0/5
+ port link-type access
+ port default vlan 53
+
+int vlan 53
+ip address 192.168.53.1 24
+
+ospf
+ area 0.0.0.0
+  network 192.168.0.0 0.0.255.255
+------------------------------------------
+
+SW2:
+stp region-configuration
+ region-name JMH
+ revision-level 100
+ instance 1 vlan 10 20 30 40 100 200
+ active region-configuration
+
+stp instance 2 root secondary 
+
+dhcp enable
+
+ip pool 10
+ gateway-list 192.168.10.254
+ network 192.168.10.0 mask 255.255.255.0
+
+ip pool 20
+ gateway-list 192.168.20.254
+ network 192.168.20.0 mask 255.255.255.0
+
+ip pool 30
+ gateway-list 192.168.30.254
+ network 192.168.30.0 mask 255.255.255.0
+
+ip pool 40
+ gateway-list 192.168.40.254
+ network 192.168.40.0 mask 255.255.255.0
+
+ip pool 200
+ gateway-list 192.168.200.254
+ network 192.168.200.0 mask 255.255.255.0
+
+interface Vlanif10
+ ip address 192.168.10.253 255.255.255.0
+ vrrp vrid 10 virtual-ip 192.168.10.254
+ dhcp select global
+
+interface Vlanif20
+ ip address 192.168.20.253 255.255.255.0
+ vrrp vrid 20 virtual-ip 192.168.20.254
+ dhcp select global
+
+interface Vlanif30
+ ip address 192.168.30.253 255.255.255.0
+ vrrp vrid 30 virtual-ip 192.168.30.254
+ dhcp select global
+
+interface Vlanif40
+ ip address 192.168.40.253 255.255.255.0
+ vrrp vrid 40 virtual-ip 192.168.40.254
+ dhcp select global
+
+interface Vlanif200
+ ip address 192.168.200.253 255.255.255.0
+ vrrp vrid 200 virtual-ip 192.168.200.254
+ dhcp select global
+
+interface GigabitEthernet0/0/6
+ port link-type access
+ port default vlan 51
+
+interface GigabitEthernet0/0/5
+ port link-type access
+ port default vlan 52
+
+int vlan 51
+ip address 192.168.51.1 24
+int vlan 52
+ip address 192.168.52.1 24
+
+ospf
+ area 0.0.0.0
+  network 192.168.0.0 0.0.255.255
+--------------------------
+
+AC:
+ sysname AC
+
+vlan batch 100 200
+ undo info-center enable
+
+interface Eth-Trunk2
+ port link-type trunk
+ port trunk allow-pass vlan 2 to 4094
+ mode lacp-static
+
+dhcp enable 
+
+int vlan 100
+ip add 192.168.100.1 24
+dhcp select interface
+qui
+capwap source interface vlanif100
+
+
+wlan
+(密码)
+security-profile name sec
+security wpa-wpa2 psk pass-phrase 2203180101 aes
+qui
+
+（ssid名称）
+ssid-profile name ssid
+ssid wlan
+qui
+
+（vap模板）
+vap-profile name vap
+ssid-profile ssid
+security-profile sec
+service-vlan vlan-id 200
+qui
+
+ap-id 1 ap-mac 00e0-fc35-4090 
+vap-profile vap wlan 1 radio all
+qui
+
+ap-id 2 ap-mac 00e0-fc64-16d0
+vap-profile vap wlan 1 radio all
+quit
+
+---------------------------
+FW1:
+
+firewall zone trust
+ add interface GigabitEthernet1/0/0
+ add interface GigabitEthernet1/0/1
+ add interface GigabitEthernet1/0/3
+
+firewall zone untrust
+ add interface GigabitEthernet1/0/2
+
+firewall zone dmz
+ add interface GigabitEthernet1/0/5
+
+interface GigabitEthernet1/0/0
+ ip address 192.168.50.2 255.255.255.0
+
+interface GigabitEthernet1/0/1
+ ip address 192.168.52.2 255.255.255.0
+
+interface GigabitEthernet1/0/2
+ ip address 100.1.1.1 255.255.255.0
+
+interface GigabitEthernet1/0/3
+ ip address 192.168.1.252 255.255.255.0
+
+interface GigabitEthernet1/0/5
+ ip address 192.168.12.1 255.255.255.0
+
+ospf
+ area 0.0.0.0
+  network 192.168.0.0 0.0.255.255
+  network  100.1.1.0 0.0.0.255
+
+ hrp interface GigabitEthernet1/0/5 remote 192.168.12.2
+ hrp track interface GigabitEthernet1/0/0
+ hrp track interface GigabitEthernet1/0/1
+hrp track interface g1/0/2
+hrp enable
+
+security-policy
+ rule name trust-untrust
+  source-zone trust
+  destination-zone untrust
+  action permit
+ rule name untrust-server
+  source-zone untrust
+  destination-zone trust
+  destination-address 192.168.1.0 mask 255.255.255.0
+  action permit
+
+nat-policy
+ rule name nat
+  source-zone trust
+  destination-zone untrust
+  action source-nat easy-ip
+
+interface GigabitEthernet1/0/3
+ vrrp vrid 1 virtual-ip 192.168.1.254 active
+---------------------------
+FW2:
+
+firewall zone trust
+ add interface GigabitEthernet1/0/0
+ add interface GigabitEthernet1/0/1
+ add interface GigabitEthernet1/0/3
+
+firewall zone untrust
+ add interface GigabitEthernet1/0/2
+
+firewall zone dmz
+ add interface GigabitEthernet1/0/5
+
+interface GigabitEthernet1/0/0
+ ip address 192.168.53.2 255.255.255.0
+
+interface GigabitEthernet1/0/1
+ ip address 192.168.51.2 255.255.255.0
+
+interface GigabitEthernet1/0/2
+ ip address 200.1.1.1 255.255.255.0
+
+interface GigabitEthernet1/0/3
+ ip address 192.168.1.253 255.255.255.0
+
+interface GigabitEthernet1/0/5
+ ip address 192.168.12.2 255.255.255.0
+
+ospf
+ area 0.0.0.0
+  network 192.168.0.0 0.0.255.255
+  network  200.1.1.0 0.0.0.255
+
+ hrp enable
+ hrp standby-device
+ hrp interface GigabitEthernet1/0/5 remote 192.168.12.1
+ hrp track interface GigabitEthernet1/0/0
+ hrp track interface GigabitEthernet1/0/1
+ hrp track interface GigabitEthernet1/0/2
+
+security-policy
+ rule name trust-untrust
+  source-zone trust
+  destination-zone untrust
+  action permit
+ rule name untrust-server
+  source-zone untrust
+  destination-zone trust
+  destination-address 192.168.1.0 mask 255.255.255.0
+  action permit
+
+nat-policy
+ rule name nat
+  source-zone trust
+  destination-zone untrust
+  action source-nat easy-ip
+
+interface GigabitEthernet1/0/3
+ vrrp vrid 1 virtual-ip 192.168.1.254 standby
+-------------------------------------
+AR1:
+
+interface GigabitEthernet0/0/0
+ ip address 200.1.1.2 255.255.255.0 
+#
+interface GigabitEthernet0/0/1
+ ip address 100.1.1.2 255.255.255.0 
+#
+interface GigabitEthernet2/0/0
+ ip address 1.1.1.254 255.255.255.0 
+#
+interface GigabitEthernet2/0/1
+ ip address 2.2.2.254 255.255.255.0 
+
+ospf 1 
+ area 0.0.0.0 
+  network 1.1.1.0 0.0.0.255 
+  network 2.2.2.0 0.0.0.255 
+  network 100.1.1.0 0.0.0.255 
+  network 200.1.1.0 0.0.0.255 
+#
+
+
+
+
+
+dis vrrp brief 
+dis hrp state
